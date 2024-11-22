@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #333;
+            color: #fff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        #numero {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        button, input {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #4CAF50;
+            color: white;
+            transform: scale(1.05);
+        }
+        button:focus {
+            outline: none;
+        }
+        .toggle-button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border-radius: 25px;
+            padding: 10px 20px;
+        }
+        input[type="number"] {
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+            width: 230px;
+            transition: all 0.3s ease;
+            outline: none;
+            text-align: center;
+        }
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+        }
+        input[type="number"]::placeholder {
+            color: #888;
+            font-style: italic;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        .light-mode {
+            background-color: #fff;
+            color: #000;
+        }
+        .numero-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .copiar-btn {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 14px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .copiar-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+        .copiar-btn:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <h1>Contador Vales</h1>
+        <div class="numero-container">
+            <p id="numero">0</p>
+            <button class="copiar-btn" onclick="copiarNumero()">Copiar</button>
+        </div>
+        <input type="number" id="inputNumero" placeholder="Establece el número inicial">
+        <button onclick="establecerNumero()">Establecer Número</button>
+        <button onclick="sumar()">+1</button>
+        <button onclick="restar()">-1</button>
+        <button onclick="guardarNumero()">Guardar Documento</button>
+        <button class="toggle-button" onclick="toggleModo()">Modo Claro</button>
+    </div>
+
+    <script>
+        let numero = 0;
+        let isDarkMode = true;
+    
+        window.onload = function () {
+            const numeroGuardado = localStorage.getItem("numero");
+            if (numeroGuardado !== null) {
+                numero = parseInt(numeroGuardado);
+            }
+            actualizarContador();
+        };
+    
+        function actualizarContador() {
+            document.getElementById("numero").textContent = numero;
+        }
+    
+        function establecerNumero() {
+            const input = document.getElementById("inputNumero").value;
+            numero = input ? parseInt(input) : 0;
+            guardarLocalmente();
+            actualizarContador();
+        }
+    
+        function sumar() {
+            numero++;
+            guardarLocalmente();
+            actualizarContador();
+        }
+    
+        function restar() {
+            numero--;
+            guardarLocalmente();
+            actualizarContador();
+        }
+    
+        function guardarLocalmente() {
+            localStorage.setItem("numero", numero);
+        }
+    
+        function toggleModo() {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                document.body.classList.add("dark-mode");
+                document.body.classList.remove("light-mode");
+                document.querySelector(".toggle-button").textContent = "Modo Claro";
+            } else {
+                document.body.classList.add("light-mode");
+                document.body.classList.remove("dark-mode");
+                document.querySelector(".toggle-button").textContent = "Modo Oscuro";
+            }
+        }
+
+        function copiarNumero() {
+            const numeroTexto = document.getElementById("numero").textContent;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(numeroTexto)
+                    .then(() => {
+                        alert("Número copiado: " + numeroTexto);
+                    })
+                    .catch(err => {
+                        console.error("Error al copiar el número:", err);
+                        alert("No se pudo copiar el número. Intenta nuevamente.");
+                    });
+            } else {
+                const inputTemporal = document.createElement("input");
+                inputTemporal.value = numeroTexto;
+                document.body.appendChild(inputTemporal);
+                inputTemporal.select();
+                try {
+                    document.execCommand("copy");
+                    alert("Número copiado: " + numeroTexto);
+                } catch (err) {
+                    console.error("Error al copiar el número:", err);
+                    alert("No se pudo copiar el número. Intenta nuevamente.");
+                }
+                document.body.removeChild(inputTemporal);
+            }
+        }
+    </script>
+</body>
+</html>
